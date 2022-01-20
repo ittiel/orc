@@ -80,8 +80,8 @@ resource "aws_security_group" "orca_alb" {
 
   ingress {
     protocol    = "tcp"
-    from_port   = 80
-    to_port     = 80
+    from_port   = 5000
+    to_port     = 5000
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -101,8 +101,8 @@ resource "aws_security_group" "orca_ecs" {
 
   ingress {
     protocol        = "tcp"
-    from_port       = "80"
-    to_port         = "80"
+    from_port       = "5000"
+    to_port         = "5000"
     security_groups = [aws_security_group.orca_alb.id]
   }
 
@@ -208,8 +208,8 @@ locals {
 
       portMappings = [
         {
-          containerPort = 80,
-          hostPort      = 80
+          containerPort = 5000,
+          hostPort      = 5000
         }
       ]
       environment = flatten([local.ecs_environment, var.environment])
@@ -252,7 +252,7 @@ resource "aws_ecs_service" "orca" {
   load_balancer {
     target_group_arn = aws_alb_target_group.orca.id
     container_name   = "orca"
-    container_port   = "80"
+    container_port   = "5000"
   }
 }
 
@@ -274,14 +274,13 @@ resource "aws_alb" "orca" {
 
 resource "aws_alb_target_group" "orca" {
   name        = "orca-alb"
-  port        = 80
+  port        = 5000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.orca.id
   target_type = "ip"
 
   health_check {
-    path    = "/"
-    #path    = "/_healthz"
+    path    = "/_healthz"
     matcher = "200"
   }
 }
@@ -292,7 +291,7 @@ resource "aws_alb_target_group" "orca" {
 
 resource "aws_alb_listener" "orca" {
   load_balancer_arn = aws_alb.orca.id
-  port              = "80"
+  port              = "5000"
   protocol          = "HTTP"
 #  certificate_arn   = aws_acm_certificate.orca.arn
 

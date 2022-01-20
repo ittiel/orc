@@ -23,13 +23,11 @@ variable "orca_version_tag" {
 variable "rds_username" {
   description = "The username for RDS"
   sensitive   = true
-
 }
 
 variable "rds_password" {
   description = "The password for RDS"
   sensitive   = true
-
 }
 
 variable "rds_db_name" {
