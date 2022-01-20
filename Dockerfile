@@ -16,6 +16,7 @@ RUN chmod 775 run_app.sh
 
 CMD ["pipenv", "run", "./run_app.sh"]
 
+##################################
 # todo: enable after adding tests
 # FROM builder as tester
 # RUN python test
