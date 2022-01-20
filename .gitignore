@@ -171,4 +171,4 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-infra/terraform/variables.tf
+#infra/terraform/variables.tf
