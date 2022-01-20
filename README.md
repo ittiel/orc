@@ -1,10 +1,12 @@
 # orc
-Orca exercise  
+Orca exercise
 
 The service uses PostgreSQL as a datastore and expects the URL and the credentials to be passed in the DATABASE_URL environment variable. 
 The service itself has 2 endpoints (in app.py),   
 one for the service itself and the other one for the healthcheck.
+
 ---
+
 ## Solution steps 
 1. Define the high level architecture and tools
 2. Run project locally on docker
@@ -35,13 +37,15 @@ one for the service itself and the other one for the healthcheck.
   - many more
 
 ---
-## packaging
+
+### packaging
 - docker (multi stage)
 
 ### CI
 - gihub action
   - multi stage dockerfile
   - push image to registry
+
 ### CD
 - gihub action
   - deploy to fargate
