@@ -6,7 +6,7 @@ ARG DATABASE_URL
 WORKDIR /app
 
 # copy sources
-ADD src/* .
+ADD src/* /app/
 # install dependencies
 RUN pip install -U pip setuptools && pip install pipenv
 
