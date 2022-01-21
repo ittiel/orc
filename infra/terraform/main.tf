@@ -195,14 +195,14 @@ resource "aws_ecs_cluster" "orca" {
 locals {
   ecs_environment = [
     {
-      name  = "orca_DATABASE_URL",
+      name  = "DATABASE_URL",
       value = "postgres://${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
     }
   ]
 
   ecs_container_definitions = [
     {
-      image       = "strm/helloworld-http:${var.orca_version_tag}"
+      image       = "orca_exercise:${var.orca_version_tag}"
       name        = "orca",
       networkMode = "awsvpc",
 
