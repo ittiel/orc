@@ -14,7 +14,6 @@ env:
   ECS_CLUSTER: orca-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: .aws/task-definition.json       # set this to the path to your Amazon ECS task definition
   CONTAINER_NAME: orca-exercise
-  TASK_DEFINITION: arn:aws:ecs:eu-west-1:022786159174:task-definition/orca
 
 jobs:
   deploy:
@@ -55,6 +54,7 @@ jobs:
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        task_execution_role: ECSDeploy
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
