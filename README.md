@@ -52,7 +52,6 @@ one for the service itself and the other one for the healthcheck.
 - gihub action
   - deploy to fargate
 
-
 ### infra as code
 - terraform
 
