@@ -75,7 +75,7 @@ resource "aws_route" "internet_access" {
 # Internet to ALB
 resource "aws_security_group" "orca_alb" {
   name        = "orca-alb"
-  description = "Allow access on port 443 only to ALB"
+  description = "Allow access on port 5000 only to ALB"
   vpc_id      = aws_vpc.orca.id
 
   ingress {
@@ -140,7 +140,7 @@ resource "aws_security_group" "orca_rds" {
 # -----------------------------------------------------------------------------
 
 resource "aws_db_subnet_group" "orca" {
-  name       = "orca"
+  name       = "orca_rds"
   subnet_ids = aws_subnet.orca_private.*.id
 }
 
@@ -205,14 +205,39 @@ resource "aws_ecs_cluster" "orca" {
   name = var.ecs_cluster_name
 }
 
+# -----------------------------------------------------------------------------
+# Create logging
+# -----------------------------------------------------------------------------
 
+resource "aws_cloudwatch_log_group" "orca" {
+  name = "/ecs/orca-exercise"
+}
 
 # -----------------------------------------------------------------------------
 # Create a task definition
 # -----------------------------------------------------------------------------
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "role-name"
+  name = "ecs-task-execution"
+
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "ecs-tasks.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+resource "aws_iam_role" "ecs_task_role" {
+  name = "ecs-task-role"
 
   assume_role_policy = <<EOF
 {
@@ -231,34 +256,49 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 EOF
 }
 
-
 resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+resource "aws_iam_role_policy_attachment" "task_s3" {
+  role       = "${aws_iam_role.ecs_task_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
 
 
 locals {
-#  ecs_environment = [
-#    {
-#      name  = "DATABASE_URL",
-#      value = "postgres://${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
-#    }
-#  ]
+  ecs_environment = [
+    {
+      name  = "DATABASE_URL",
+      value = "${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
+    }
+  ]
 
   ecs_container_definitions = [
     {
-      image       = "orca_exercise:${var.orca_version_tag}"
+      image       = "022786159174.dkr.ecr.eu-west-1.amazonaws.com/orca:${var.orca_version_tag}"
       name        = "orca",
       networkMode = "awsvpc",
-
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group         = "${aws_cloudwatch_log_group.orca.name}",
+          awslogs-region        = "${var.region}",
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+#      "secrets": [{
+#          "name": "DATABASE_URL",
+#          "valueFrom": "arn:aws:ssm:eu-west-1:022786159174:parameter/DATABASE_URL"
+#      }],
       portMappings = [
         {
           containerPort = 5000,
           hostPort      = 5000
         }
       ]
-#      environment = flatten([local.ecs_environment, var.environment])
+      environment = flatten([local.ecs_environment, var.environment])
     }
   ]
 }
@@ -270,6 +310,7 @@ resource "aws_ecs_task_definition" "orca" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode(local.ecs_container_definitions)
@@ -328,8 +369,45 @@ resource "aws_alb_target_group" "orca" {
 
   health_check {
     path    = "/_healthz"
+    port        = 5000
     matcher = "200"
   }
+}
+
+
+
+# -----------------------------------------------------------------------------
+# Create the ALB log bucket
+# -----------------------------------------------------------------------------
+
+resource "aws_s3_bucket" "orca" {
+  bucket        = "orca-${var.region}-orca-exercise"
+  acl           = "private"
+  force_destroy = "true"
+}
+
+# -----------------------------------------------------------------------------
+# Add IAM policy to allow the ALB to log to it
+# -----------------------------------------------------------------------------
+
+data "aws_elb_service_account" "main" {
+}
+
+data "aws_iam_policy_document" "orca" {
+  statement {
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.orca.arn}/alb/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_elb_service_account.main.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "orca" {
+  bucket = aws_s3_bucket.orca.id
+  policy = data.aws_iam_policy_document.orca.json
 }
 
 # -----------------------------------------------------------------------------

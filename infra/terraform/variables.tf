@@ -17,7 +17,8 @@ variable "region" {
 
 variable "orca_version_tag" {
   description = "The orca app version tag"
-  default     = "latest"
+  default     = "66d36489e7e5eff511496442b53cce49570f9183"
+
 }
 
 variable "rds_username" {
@@ -36,8 +37,8 @@ variable "rds_db_name" {
 }
 
 variable "rds_instance" {
-  description = "The size of RDS instance, eg db.t2.micro"
-  default = "db.t2.micro"
+  description = "The size of RDS instance, eg db.t2.medium"
+  default = "db.t2.medium"
 }
 
 variable "rds_storage_encrypted" {
