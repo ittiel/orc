@@ -179,6 +179,25 @@ resource "aws_db_instance" "orca" {
 }
 
 # -----------------------------------------------------------------------------
+# Creating a AWS secret for database master account (DATABASE_URL)
+# -----------------------------------------------------------------------------
+
+resource "aws_secretsmanager_secret" "DATABASE_URL" {
+   name = "DATABASE_URL"
+}
+
+# Creating a AWS secret versions for database master account (DATABASE_URL)
+
+resource "aws_secretsmanager_secret_version" "version" {
+  secret_id = aws_secretsmanager_secret.DATABASE_URL.id
+  secret_string = <<EOF
+   {
+    ${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
+   }
+EOF
+}
+
+# -----------------------------------------------------------------------------
 # Create ECS cluster
 # -----------------------------------------------------------------------------
 
@@ -193,12 +212,12 @@ resource "aws_ecs_cluster" "orca" {
 # -----------------------------------------------------------------------------
 
 locals {
-  ecs_environment = [
-    {
-      name  = "DATABASE_URL",
-      value = "postgres://${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
-    }
-  ]
+#  ecs_environment = [
+#    {
+#      name  = "DATABASE_URL",
+#      value = "postgres://${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
+#    }
+#  ]
 
   ecs_container_definitions = [
     {
@@ -212,7 +231,7 @@ locals {
           hostPort      = 5000
         }
       ]
-      environment = flatten([local.ecs_environment, var.environment])
+#      environment = flatten([local.ecs_environment, var.environment])
     }
   ]
 }

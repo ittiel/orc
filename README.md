@@ -30,13 +30,13 @@ one for the service itself and the other one for the healthcheck.
   - separate modules to different projects (single project only for exercise readability):
     - Terraform: infrastructure separation from application
     - RDS: as it should not depend on the application state
-    - ECS service
+    - ECS service/ task definition
   - move postgresql credential in AWS secret manager after DB creation
-  - handle versions and upgrades
+    - avoid spreading the credentials to different services as github
   - add loggings, monitoring, and alerts
-  - add tests, enable tests stage in Dockerfile and CI
-  - AWS: IAM improvements (key permissions, do not use root, etc.)
-  - many more
+  - add tests, lint etc to the multi-stage Dockerfile and CI
+  - AWS: IAM hardening (key permissions, do not use root, etc.)
+
 
 ---
 
