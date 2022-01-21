@@ -34,7 +34,7 @@ one for the service itself and the other one for the healthcheck.
   - move postgresql credential in AWS secret manager after DB creation
     - avoid spreading the credentials to different services as github
   - add loggings, monitoring, and alerts
-  - add tests, lint etc to the multi-stage Dockerfile and CI
+  - add tests, lint etc. to the multi-stage Dockerfile and CI
   - AWS: IAM hardening (key permissions, do not use root, etc.)
 
 
