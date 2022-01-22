@@ -1,4 +1,4 @@
-FROM python:3.8 as builder
+FROM python -m pip install psycopg2 as builder
 
 
 # todo: separate builder, tester and application
@@ -10,7 +10,7 @@ WORKDIR /app
 ADD src/* /app/
 # install dependencies
 RUN pip install -U pip setuptools && pip install pipenv
-
+RUN python -m pip install psycopg2 psycopg2-binary
 RUN pipenv install
 
 # Establish the runtime user (with no password and no sudo)
