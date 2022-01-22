@@ -12,34 +12,34 @@ one for the service itself and the other one for the healthcheck.
 2. Run project locally on docker
     - fix dependencies:
       - missing psycopg2
-    - fix local issues :(
-3. prepare **ALL** required resources on AWS
+    - fix many local issues on my machine :(
+3. prepare  required resources on AWS using terraform
    - pulumi looks like a nice option as well.
 4. setup github action to 
    1. build and push the application docker to AWS ECR
-   2. push image AWS fargate
-   Note: AWS and Postgres credentials are save as project secrets in github
+   2. deploy to AWS fargate
 
 ## Considerations
-- fully automated solution
-- separate CI from CD
-- infra as code
-  - cloud agnostic
+ - for some preferred learning/practising new tools on best practise:
+      - fargate over EKS
+      - github and github actions over Jenkins/AWS tools
+ - fully automated solution
+   - infra as code
   
 ## todos
+  - security:
+    - move postgresql credential in AWS secret manager after DB creation
+    - replace DB credentials as environment variables with AWS secret manager
+    - IAM hardening (key permissions, do not use root, etc.)
+    - disable access for rds outside the VPC
   - separate modules to different projects (single project only for exercise readability):
-    - Terraform: infrastructure separation from application
+    - infrastructure separation from application
     - RDS: as it should not depend on the application state
     - ECS service/ task definition
-  - move postgresql credential in AWS secret manager after DB creation
   - add loggings, monitoring, and alerts
   - Dockerfile and CI:
     - use a slim image version for runtime
     - add tests, lint etc. to the multi-stage Dockerfile and CI
-  - AWS: 
-    - IAM hardening (key permissions, do not use root, etc.)
-    - disable access for rds outside the VPC
-
 
 ---
 
