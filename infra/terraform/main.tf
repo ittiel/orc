@@ -160,7 +160,7 @@ resource "aws_db_instance" "orca" {
   parameter_group_name   = "default.postgres10"
   multi_az               = var.multi_az
   storage_type           = "gp2"
-  publicly_accessible    = false
+  publicly_accessible    = true
 
   # snapshot_identifier       = "orca"
   allow_major_version_upgrade = false
@@ -183,7 +183,7 @@ resource "aws_db_instance" "orca" {
 # -----------------------------------------------------------------------------
 
 resource "aws_secretsmanager_secret" "DATABASE_URL" {
-   name = "DATABASE_URL"
+   name = "DATABASE_URL2"
 }
 
 # Creating a AWS secret versions for database master account (DATABASE_URL)
@@ -192,7 +192,7 @@ resource "aws_secretsmanager_secret_version" "version" {
   secret_id = aws_secretsmanager_secret.DATABASE_URL.id
   secret_string = <<EOF
    {
-    ${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
+    postgresql://${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
    }
 EOF
 }
@@ -271,7 +271,7 @@ locals {
   ecs_environment = [
     {
       name  = "DATABASE_URL",
-      value = "${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}"
+      value = "postgresql://${var.rds_username}:${var.rds_password}@${aws_db_instance.orca.endpoint}/postgres"
     }
   ]
 

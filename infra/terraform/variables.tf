@@ -17,18 +17,20 @@ variable "region" {
 
 variable "orca_version_tag" {
   description = "The orca app version tag"
-  default     = "66d36489e7e5eff511496442b53cce49570f9183"
+  default     = "6eb2b31a037fe850c75e5b0de2f28db0d4c64449"
 
 }
 
 variable "rds_username" {
   description = "The username for RDS"
   sensitive   = true
+  default = "myUsername"
 }
 
 variable "rds_password" {
   description = "The password for RDS"
   sensitive   = true
+  default = "myPassword"
 }
 
 variable "rds_db_name" {
@@ -58,7 +60,7 @@ variable "multi_az" {
 
 variable "vpc_enable_dns_hostnames" {
   description = "A boolean flag to enable/disable DNS hostnames in the VPC. Defaults false."
-  default     = false
+  default     = true
 }
 
 variable "environment" {
