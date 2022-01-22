@@ -39,6 +39,7 @@ one for the service itself and the other one for the healthcheck.
     - infrastructure separation from application
     - RDS: as it should not depend on the application state
     - ECS service/ task definition
+  - add auto scale to fargate deployment
   - add monitoring, and alerts
   - Dockerfile and CI:
     - use a slim image version for runtime
