@@ -14,10 +14,10 @@ RUN pip install -U pip setuptools && pip install pipenv
 RUN pipenv install
 
 # Establish the runtime user (with no password and no sudo)
-RUN useradd -m candidate
-RUN chown candidate /app/*
-
-USER candidate
+# RUN useradd -m candidate
+# RUN chown candidate /app/*
+#
+# USER candidate
 RUN chmod 775 run_app.sh
 
 CMD ["pipenv", "run", "./run_app.sh"]
