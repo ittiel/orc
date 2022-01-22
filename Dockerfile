@@ -1,4 +1,4 @@
-FROM python -m pip install psycopg2 as builder
+FROM python:3.8 as builder
 
 
 # todo: separate builder, tester and application
